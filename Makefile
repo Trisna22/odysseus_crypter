@@ -30,7 +30,7 @@ run:
 	$(BUILD_FOLDER)/$(CRYPTER1) $(BUILD_FOLDER)/$(TARGET)
 
 	@echo Place the encrypted binary in stub source.
-	python3 $(SOURCE_FOLDER)/$(CRYPTER1)/placePayload.py ./config/stage1_skeleton.h
+	python3 $(SOURCE_FOLDER)/$(CRYPTER1)/placePayload.py
 
 	@echo Now compile binary for stage 2.
 	g++ --no-warnings -o $(BUILD_FOLDER)/$(STUB) $(SOURCE_FOLDER)/$(STUB)/$(STUB).cpp

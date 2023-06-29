@@ -3,11 +3,7 @@
 # Project:      Part of memory_binary_crypter
 import sys
 
-if len(sys.argv) != 2:
-    print("Usage: %s" % sys.argv[0])
-    sys.exit(1)
-
-sourceFile = open(sys.argv[1], "r")
+sourceFile = open("./src/stub/Stage1.h", "r")
 source = sourceFile.read()
 
 print("Placing (encrypted) buffer in target source...")
@@ -20,7 +16,7 @@ with open("./config/key.dat", "r") as f:
     key = f.read()
     source = source.replace("{{KEY}}", key)    
     
-with open("./src/stub/Stage1.h", "w") as w:
+with open("./src/stub/Stage1_generated.h", "w") as w:
     w.write(source)
 
 print("Stub generated...\n")

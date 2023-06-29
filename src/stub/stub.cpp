@@ -1,7 +1,7 @@
 
 #include "stdafx.h"
 
-#include "Stage1.h"
+#include "Stage1_generated.h" // For the source with stage 2 capabilities.
 #include "Stage2.h"
 
 int main(int argc, char* argv[]) {
