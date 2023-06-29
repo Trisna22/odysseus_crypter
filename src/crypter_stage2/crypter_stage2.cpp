@@ -31,7 +31,6 @@ unsigned char* encryptBytes(unsigned char* bytes, int size) {
     for (int i = 0; i < size; i++) {
         encrypted[i] = bytes[i] +13;
     }
-
     return encrypted;
 }
 
@@ -85,7 +84,16 @@ bool encryptSection(char* progname) {
                 return false;
             }
             printf("Succesfully encryped .secure section!\n");
-        }        
+        }     
+
+        if (memcmp(stringTable + allSections[i].sh_name, ".secret\0", 8) == 0) {
+            
+            if (!encryptSection(target, allSections[i])) {
+                printf("Failed to pack section!\n");
+                return false;
+            }
+            printf("Succesfully encryped .secret section!\n");
+        }      
     }
 
     fclose(target);

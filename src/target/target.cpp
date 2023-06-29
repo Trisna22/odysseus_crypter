@@ -3,5 +3,5 @@
 
 int main(int argc, char* argv[]) {
 
-    printf("Malicious content\n");
+    printf("\n\033[91mFuck yeah, Lucifer I'm Evil! ;]\033[39m\n");
 }

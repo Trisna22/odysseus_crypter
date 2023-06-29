@@ -3,7 +3,6 @@
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
-
+#include <sys/stat.h>
 #include <elf.h>
-
-using namespace std;
+#include <unistd.h>

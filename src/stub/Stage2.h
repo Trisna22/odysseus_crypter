@@ -1,24 +1,7 @@
 #include "stdafx.h"
 
-#ifndef Loader_H
-#define Loader_H
-
-#define CRYPTED __attribute__((section(".secure")))
-
-/**
- * @brief Encrypted, hidden section functions. 
- */
-CRYPTED int stub() {/* Marker for top of section */}
-// CRYPTED unsigned char key[] = "{{key}}"; // for replace("{{key}}", actualKey);
-CRYPTED unsigned char* decodePayload() {
-
-    unsigned char data[] = "{{payload}}"; // for replace("{{payload}}", actualPayload);
-
-    printf("Evil function active...\n");
-
-    return data;
-}
-
+#ifndef Stage2_H
+#define Stage2_H
 
 /**
  * Functions that decodes the sections.
@@ -30,7 +13,7 @@ private:
     Elf64_Shdr* allSections;
 
     // Decrypts an section.
-    bool decryptSection(Elf64_Shdr secretSection) {
+    bool decryptSection(Elf64_Shdr secretSection, bool keySection = false) {
 
         // First locate the (encrypted) function bytes.
         fseek(target, secretSection.sh_offset, SEEK_SET);
@@ -40,10 +23,13 @@ private:
         // Decrypt the section bytes.
         unsigned char* decrypted = decryptBytes(functionBytes, secretSection.sh_size);
 
-
         // Now overwrite the function bytes inside memory page.
         long pageSize = sysconf(_SC_PAGE_SIZE);
-        long pageAddr = (long)&stub-((long)&stub % pageSize);
+        long pageAddr = 0;
+        if (!keySection)
+            pageAddr = (long)&stub-((long)&stub % pageSize);
+        else
+            pageAddr = (long)&codedPayload - ((long)&codedPayload % pageSize);
 
         // Change the permissions to able to write.
         if (mprotect((void*)pageAddr, pageSize, PROT_READ | PROT_WRITE | PROT_EXEC) < 0) {
@@ -52,7 +38,10 @@ private:
         }
 
         // Write the decrypted data to the correct location inside the page.
-        memcpy((void*)&stub, decrypted, secretSection.sh_size);
+        if (keySection)
+            memcpy((void*)&codedPayload, decrypted, secretSection.sh_size);
+        else
+            memcpy((void*)&stub, decrypted, secretSection.sh_size);
 
         // Set permissions back.
         if (mprotect ((void*)pageAddr, pageSize, PROT_READ | PROT_EXEC) < 0) {
@@ -117,19 +106,25 @@ public:
             if (memcmp(stringTable + allSections[i].sh_name, ".secure\0", 8) == 0) {
                 
                 if (!decryptSection(allSections[i])) {
-                    printf("Failed to unpack section!\n\n");
+                    printf("Failed to unpack section secure!\n\n");
                     return false;
                 }
+
+                printf("Decrypted .secure section...\n");
             }
+
+            if (memcmp(stringTable + allSections[i].sh_name, ".secret\0", 8) == 0) {
+                if (!decryptSection(allSections[i], true)) {
+                    printf("Failed to unpack section secret!\n\n");
+                    return false;
+                }
+                printf("Decrypted .secret section...\n");
+            }        
         }
 
         return true;
     }
-
-    unsigned char* getKey() {
-        return NULL;
-    }
 };
 
 
-#endif //! ~Loader_H
+#endif //! ~Stage2_H
