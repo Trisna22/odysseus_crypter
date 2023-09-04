@@ -31,6 +31,5 @@ make run
 
 ## Resources
 https://github.com/droberson/ELFcrypt  
-https://github.com/oldboy21/CGPL  
 https://0x00sec.org/t/binary-armory-wiki/25679/9  
 https://github.com/0x00pf/0x00sec_code/tree/master/crypter  
